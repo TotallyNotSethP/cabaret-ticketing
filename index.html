@@ -3,13 +3,18 @@
   <head>
     <title>Instascan</title>
     <script type="text/javascript" src="static/instascan.min.js"></script>
+    <script
+  src="https://code.jquery.com/jquery-3.6.0.min.js"
+  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+  crossorigin="anonymous"></script>
   </head>
   <body>
     <video id="preview"></video>
+    <div id="contentgoeshere">Scan A QR Code!</div>
     <script type="text/javascript">
       let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
       scanner.addListener('scan', function (content) {
-        console.log(content);
+        $("#contentgoeshere").html(content)
       });
       Instascan.Camera.getCameras().then(function (cameras) {
         if (cameras.length > 0) {
