@@ -5,7 +5,8 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return "<h1>Hello World!</h1>"
+    with open("index.html") as f:
+        return f.read()
 
 
 if __name__ == "__main__":
