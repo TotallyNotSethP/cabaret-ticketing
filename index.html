@@ -1,29 +1,30 @@
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
-    <title>Instascan</title>
-    <script type="text/javascript" src="static/instascan.min.js"></script>
-    <script
-  src="https://code.jquery.com/jquery-3.6.0.min.js"
-  integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-  crossorigin="anonymous"></script>
+    <title>QR Code Scan Test</title>
+
+    <!-- Imports -->
+    <script type="text/javascript" src="static/instascan.min.js"></script> <!-- Instascan powers QR Code Scanning -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+            crossorigin="anonymous"></script> <!-- JQuery powers the website basics -->
   </head>
   <body>
-    <video id="preview"></video>
-    <div id="contentgoeshere">Scan A QR Code!</div>
+    <video id="preview"></video> <!-- Instascan puts the Camera Preview in here -->
+    <div id="content-goes-here">Scan A QR Code!</div> <!-- Instascan puts the content of the QR Code in here -->
     <script type="text/javascript">
-      let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
-      scanner.addListener('scan', function (content) {
-        $("#contentgoeshere").html(content)
+      let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false }); // Creates QR Code Scanner
+      scanner.addListener('scan', function (content) { // If QR Code is scanned,
+        $("#content-goes-here").html(content)          // put it's content in the div above
       });
-      Instascan.Camera.getCameras().then(function (cameras) {
-        if (cameras.length > 0) {
-          scanner.start(cameras[0]);
-        } else {
-          console.error('No cameras found.');
+      Instascan.Camera.getCameras().then(function (cameras) { // Once cameras are loaded,
+        if (cameras.length > 0) {                             // (if there are any)
+          scanner.start(cameras[0]);                          // start camera #1 (index 0).
+        } else {                                              // If there aren't any cameras,
+          $("#content-goes-here").html('No cameras found.');  // tell the user.
         }
-      }).catch(function (e) {
-        console.error(e);
+      }).catch(function (e) {            // If there's a problem,
+        $("#content-goes-here").html(e); // tell the user.
       });
     </script>
   </body>
