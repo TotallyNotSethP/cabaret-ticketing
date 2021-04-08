@@ -1,5 +1,5 @@
 # Imports
-from flask import Flask
+from flask import Flask, Response
 
 # Make A Flask App
 app = Flask(__name__)
@@ -13,9 +13,9 @@ def index():
 
 
 # Shh! This will soon be used to get information about a ticket.
-@app.route("/internals/getid/<int:id>")
-def _get_id(id):
-    pass
+@app.route("/internals/get_id/<int:id_>")
+def _get_id(id_):
+    return Response("Not implemented yet.", status=503)
 
 
 # Runs A Development Server If You Directly Run The Script
