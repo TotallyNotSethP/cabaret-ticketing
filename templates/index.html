@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="en-us">
     <!--
-    (C) 2021 Seth Peace
+    (c) 2021 Seth Peace
     All Rights Reserved
 
     Licensed to Classical Academy Middle School
     Please No Unauthorized Use ~ Forking is OK
     Thank You,
     𝓢𝓮𝓽𝓱 𝓟𝓮𝓪𝓬𝓮
+
+    Included Open Source Software:
+     - Instascan by @schmich ~ License Located at /static/instascan-LICENSE
     -->
 
     <head>
         <title>QR Code Scan Test</title>
 
         <!-- Imports -->
-        <script type="text/javascript" src="static/instascan.min.js"></script> <!-- Instascan powers QR Code Scanning -->
+        <script type="text/javascript" src="{{ url_for('static', filename='instascan.min.js') }}"></script> <!-- Instascan powers QR Code Scanning -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"
                 integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
                 crossorigin="anonymous"></script> <!-- JQuery powers the website basics -->
