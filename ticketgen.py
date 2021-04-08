@@ -1,5 +1,5 @@
 def main(header="TCA's Musical Theater Presents...", data=(), footer="Located At The Ritz Theater",
-         copyright_="Ticket Created By Seth Peace", logo_size=3.5):
+         copyright_="Ticket Created By Seth Peace", logo_size=3.5, logo="static/logo.jpg", save_to="static/ticket.pdf"):
     # Import built-ins
     import os
 
@@ -19,10 +19,10 @@ def main(header="TCA's Musical Theater Presents...", data=(), footer="Located At
         f.write(response.content)
 
     # Set Up PDF
-    canvas = Canvas("ticket.pdf", pagesize=A8[::-1])
+    canvas = Canvas(save_to, pagesize=A8[::-1])
 
     # Draw Logo
-    canvas.drawImage("logo.jpg", 0.775 * inch, 1.15 * inch, logo_size * cm, (907 / 2250) * logo_size * cm)
+    canvas.drawImage(logo, 0.775 * inch, 1.15 * inch, logo_size * cm, (907 / 2250) * logo_size * cm)
 
     # Draw Header
     canvas.drawString(0.2 * inch, 1.8 * inch, header)
@@ -54,18 +54,10 @@ def main(header="TCA's Musical Theater Presents...", data=(), footer="Located At
 # Run A Test Case If Script Run Directly
 if __name__ == '__main__':
     # Constants
-    HEADER = "TCA's Musical Theater Presents..."
     DATA = ("Tikva Peace",
             "Ticket #12 of 12",
             "Sat 5/15/21 8pm (Roof)",
             "Matata Cast")
-    FOOTER = "Located At The Ritz Theater"
-    COPYRIGHT = "Ticket Created By Seth Peace"
-    LOGO_SIZE = 3.5
 
     # Call The Function Above
-    main(header=HEADER,
-         data=DATA,
-         footer=FOOTER,
-         copyright_=COPYRIGHT,
-         logo_size=LOGO_SIZE)
+    main(data=DATA)
