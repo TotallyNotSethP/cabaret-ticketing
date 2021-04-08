@@ -14,7 +14,7 @@ def index():
 
 # Shh! This will soon be used to get information about a ticket.
 @app.route("/internals/get_id/<int:id_>")
-def _get_id(id_):
+def get_id(id_):
     return Response("Not implemented yet.", status=503)
 
 

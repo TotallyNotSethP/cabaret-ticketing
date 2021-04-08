@@ -1,5 +1,15 @@
 <!DOCTYPE html>
 <html lang="en-us">
+    <!--
+    (C) 2021 Seth Peace
+    All Rights Reserved
+
+    Licensed to Classical Academy Middle School
+    Please No Unauthorized Use ~ Forking is OK
+    Thank You,
+    𝓢𝓮𝓽𝓱 𝓟𝓮𝓪𝓬𝓮
+    -->
+
     <head>
         <title>QR Code Scan Test</title>
 
@@ -10,21 +20,27 @@
                 crossorigin="anonymous"></script> <!-- JQuery powers the website basics -->
     </head>
     <body>
-        <video id="preview"></video> <!-- Instascan puts the Camera Preview in here -->
-        <div id="content-goes-here">Scan A QR Code!</div> <!-- Instascan puts the content of the QR Code in here -->
+        <video id="preview"></video> <!-- Instascan puts the Camera Preview in here TODO: Make it look better -->
+        <div id="content-goes-here">Scan A QR Code!</div> <!-- Instascan puts the content of the QR Code in here TODO: Make it look better -->
+
         <script type="text/javascript">
-            let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false }); // Creates QR Code Scanner
-            scanner.addListener('scan', function (content) { // If QR Code is scanned,
-                $("#content-goes-here").html(content)          // put it's content in the div above
+            let scanner = new Instascan.Scanner({          // Create a QR Code Scanner
+                video: document.getElementById('preview'), // and put it in the video element above,
+                mirror: false                              // but don't mirror the video feed.
             });
+
+            scanner.addListener('scan', function (content) { // If a QR Code is scanned,
+                $("#content-goes-here").html(content)        // put it's content in the div above.
+            });
+
             Instascan.Camera.getCameras().then(function (cameras) {    // Once cameras are loaded,
                 if (cameras.length > 0) {                              // (if there are any)
-                    scanner.start(cameras[0]);                         // start camera #1 (index 0).
+                    scanner.start(cameras[0]);                         // start camera #1 (index 0). TODO: Let User Pick Which Camera
                 } else {                                               // If there aren't any cameras,
                     $("#content-goes-here").html('No cameras found.'); // tell the user.
                 }
             }).catch(function (e) {              // If there's a problem,
-                $("#content-goes-here").html(e); // tell the user.
+                $("#content-goes-here").html(e); // tell the user. TODO: Eliminate Any Problems!
             });
         </script>
     </body>
