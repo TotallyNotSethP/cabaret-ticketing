@@ -28,7 +28,10 @@ def get_ticket(id_):
                         "tickets.order_number = o.order_number INNER JOIN showtimes s on tickets.showtime = s.showtime "
                         " WHERE ticket_id=%(ticket_id)s ORDER BY tickets.order_number, ticket_number;",
                         {"ticket_id": id_})
-            return flask.Response(json.dumps(dict(cur.fetchone()), default=str), mimetype="application/json")
+            try:
+                return Response(json.dumps(dict(cur.fetchone()), default=str), mimetype="application/json")
+            except TypeError:
+                return Response(status=404)
 
 
 # Runs A Development Server If You Directly Run The Script
