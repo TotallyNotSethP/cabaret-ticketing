@@ -27,7 +27,7 @@ def get_ticket(id_):
     with psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT ticket_id, cast_member_name, o.order_number, ticket_number, s.showtime, on_roof, "
-                        "seating_group, tickets_in_order, \"cast\" FROM tickets INNER JOIN orders o on "
+                        "seating_group, tickets_in_order, \"cast\", scanned FROM tickets INNER JOIN orders o on "
                         "tickets.order_number = o.order_number INNER JOIN showtimes s on tickets.showtime = s.showtime "
                         " WHERE ticket_id=%(ticket_id)s ORDER BY tickets.order_number, ticket_number;",
                         {"ticket_id": id_})
