@@ -24,7 +24,7 @@ def get_id(id_):
     with psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM tickets WHERE ticket_id=%(ticket_id)s;", {"ticket_id": id_})
-            return flask.Response(json.dumps(dict(cur.fetchone())), mimetype="application/json")
+            return flask.Response(json.dumps(dict(cur.fetchone()), default=str), mimetype="application/json")
 
 
 # Runs A Development Server If You Directly Run The Script
