@@ -8,15 +8,16 @@
     Please No Unauthorized Use ~ Forking is OK
     Thank You,
     𝓢𝓮𝓽𝓱 𝓟𝓮𝓪𝓬𝓮
+
+    Included Open Source Software:
+     - Instascan by @schmich ~ License Located at /static/instascan-LICENSE
     -->
 
     <head>
         <title>QR Code Scan Test</title>
 
         <!-- Imports -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/instascan/1.0.0/index.min.js"
-                integrity="sha512-ve8zzIbgiFFiUFW32RRJD+NBFRoVrGlhYfRLcTbQrqcFeazoPxhV03wWlyvDQE+/8GgZSMp+HqJlVBloc9D2vA=="
-                crossorigin="anonymous"></script> <!-- Instascan powers QR Code Scanning -->
+        <script type="text/javascript" src="{{ url_for('static', filename='js/instascan.min.js') }}"></script> <!-- Instascan powers QR Code Scanning -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"
                 integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
                 crossorigin="anonymous"></script> <!-- JQuery powers the website basics -->
@@ -25,13 +26,13 @@
         <video id="preview"></video> <!-- Instascan puts the Camera Preview in here TODO: Make it look better -->
         <div id="content-goes-here">Scan A QR Code!</div> <!-- Instascan puts the content of the QR Code in here TODO: Make it look better -->
 
-        <script type="text/javascript"> // TODO: Rewrite in Brython
+        <script type="text/javascript">
             let scanner = new Instascan.Scanner({          // Create a QR Code Scanner
                 video: document.getElementById('preview'), // and put it in the video element above,
-                mirror: false                              // but don't mirror the video feed. TODO: Add Mirror Option?
+                mirror: false                              // but don't mirror the video feed.
             });
 
-            scanner.addEventListener('scan', function (content) { // If a QR Code is scanned,
+            scanner.addListener('scan', function (content) { // If a QR Code is scanned,
                 $("#content-goes-here").html(content)        // put it's content in the div above.
             });
 
