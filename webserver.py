@@ -21,6 +21,11 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/helloworld")
+def helloworld():
+    return render_template("brython_hello_world.html")
+
+
 # Shh! This is used on the back end to get information about a ticket.
 @app.route("/internals/get_ticket/<id_>")
 def get_ticket(id_):
