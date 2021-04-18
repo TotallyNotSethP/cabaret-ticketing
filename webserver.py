@@ -1,5 +1,9 @@
 # Imports
+import os
+import json
+
 from flask import Flask, make_response, render_template
+import psycopg2
 
 # Make A Flask App
 app = Flask(__name__, template_folder="templates")
@@ -12,10 +16,14 @@ def index():
 
 
 # Shh! This will soon be used to get information about a ticket.
-@app.route("/internals/get_id/<int:id_>")
+@app.route("/internals/get_id/<str:id_>")
 def get_id(id_):
-    response = make_response("Not implemented yet.", 503)
-    response["Content-Type"] = "text/plain"
+    DATABASE_URL = os.environ.get('DATABASE_URL')
+    with psycopg2.connect(DATABASE_URL) as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT * FROM tickets WHERE ticket_id=%(ticket_id)s;", {"ticket_id": id_})
+            response = make_response(json.dumps(dict(cur.fetchone())))
+    response["Content-Type"] = "application/json"
     return response
 
 

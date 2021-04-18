@@ -4,12 +4,15 @@ import datetime
 import json
 import re
 import typing
+import string
+import logging
 
 import requests
 import urllib
 import psycopg2
 import psycopg2.extras
 import openpyxl
+import coloredlogs
 
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.colors import HexColor
@@ -70,10 +73,10 @@ def add_order_to_database(order_number: str, tickets_in_order):
 
 
 def get_cast_from_showtime(showtime: datetime.datetime):
-    with psycopg2.connect(DATABASE_URL) as conn:
+    with psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM showtimes WHERE showtime=%(showtime)s", {"showtime": showtime})
-            return cur.fetchone()[1]
+            return cur.fetchone()["cast"]
 
 
 def gen_ticket(header: str = "TCA's Musical Theater Presents...", data: tuple[str, str, str, str] = (),
@@ -128,8 +131,8 @@ def gen_tickets(cast_member: str, order_number: str, showtime: datetime.datetime
     for ticket_number in range(int(tickets_generated_in_order + 1), int(tickets_generated_in_order + tickets + 1)):
         seating_group = "A" if int(tickets_generated_in_showtime) < 50 else "B"
 
-        print(f"Generating Ticket #{ticket_number}/{total_tickets} For {cast_member} "
-              f"(Showtime: {formatted_showtime})")
+        logging.info(f"Generating Ticket #{ticket_number}/{total_tickets} For {cast_member} "
+                     f"(Showtime: {formatted_showtime})")
 
         DATA = (cast_member,
                 f"Order {order_number} (#{ticket_number} of {total_tickets})",
@@ -148,7 +151,8 @@ def gen_tickets(cast_member: str, order_number: str, showtime: datetime.datetime
 def gen_order(cast_member: str, order_number: str, tickets: list[typing.Mapping[str, typing.Any], ...]):
     total_tickets = int(sum([showtime["tickets"] for showtime in tickets]))
 
-    print(f"Generating {total_tickets} Tickets For {cast_member} (Order {order_number})")
+    print()
+    logging.info(f"Generating {total_tickets} Tickets For {cast_member} (Order {order_number})")
 
     tickets_generated_in_order = 0
     for showtime in tickets:
@@ -157,7 +161,7 @@ def gen_order(cast_member: str, order_number: str, tickets: list[typing.Mapping[
                              + (" (Roof)" if showtime["on_roof"] else "")
         CAST = get_cast_from_showtime(showtime["showtime"])
 
-        gen_tickets(cast_member, order_number, showtime["showtime"], showtime["tickets_generated"], CAST,
+        gen_tickets(cast_member, str(order_number), showtime["showtime"], showtime["tickets_generated"], CAST,
                     showtime["on_roof"], tickets_generated_in_order, showtime["tickets"], formatted_showtime,
                     total_tickets)
 
@@ -168,7 +172,7 @@ def gen_order(cast_member: str, order_number: str, tickets: list[typing.Mapping[
 
 def scan_spreadsheet(spreadsheet: typing.Annotated[str, "Path to an .xlsx file"] = "static/xlsx/"
                                                                                    "Lion King Tickets Spreadsheet.xlsx",
-                     data_range: typing.Annotated[str, "Excel data range"] = "A5:Z61"):
+                     data_range: typing.Annotated[str, "Excel data range"] = "A6:Z6"):
     SHOWTIME_INCREMENTORS = {(datetime.datetime(2021, 5, 7, 16, 0), None): Incrementer(),
                              (datetime.datetime(2021, 5, 7, 18, 0), None): Incrementer(),
                              (datetime.datetime(2021, 5, 7, 20, 0), False): Incrementer(),
@@ -225,33 +229,53 @@ def scan_spreadsheet(spreadsheet: typing.Annotated[str, "Path to an .xlsx file"]
 
     orders = []
 
-    for row in data:
+    for row_num, row in enumerate(data):
         order = {"cast_member": "THIS SHOULDN'T APPEAR IN PRODUCTION",
                  "order_number": "THIS SHOULDN'T APPEAR IN PRODUCTION",
                  "tickets": []}
-        for i, cell in enumerate(row):
-            cell_column = COLUMNS[i]
+        for col, cell in enumerate(row):
+            cell_column = COLUMNS[col]
 
             if cell_column == "Name":
                 order["cast_member"] = cell.value
             elif cell_column == "Order #":
-                order["order_number"] = cell.value
+                if isinstance(cell.value, float):
+                    order["order_number"] = str(int(cell.value))
+                else:
+                    order["order_number"] = cell.value
             elif isinstance(cell_column, tuple) \
                     and isinstance(cell_column[0], datetime.datetime) \
                     and isinstance(cell_column[1], (bool, type(None))) \
-                    and cell.value is not None:
+                    and isinstance(cell.value, (float, int)):
                 order["tickets"].append({"showtime": cell_column[0], "on_roof": cell_column[1],
                                          "tickets": cell.value,
                                          "tickets_generated": SHOWTIME_INCREMENTORS[cell_column[0], cell_column[1]]})
-            elif cell.value is not None:
+            elif isinstance(cell.value, float):
                 raise ValueError("Invalid Column: " + repr(cell_column))
+            elif cell.value is not None:
+                start_cell_loc = data_range.split(":")[0]
+                if start_cell_loc[1].isnumeric():
+                    row_num_offset = int(start_cell_loc[1:])
+                else:
+                    row_num_offset = int(start_cell_loc[0:])
+                print()
+                logging.warning(f"Cell with value {repr(cell.value)} ignored @ "
+                                f"{string.ascii_uppercase[col]}{row_num+row_num_offset}!")
         if len(order["tickets"]) > 0:
             orders.append(order)
     return orders
 
 
-if __name__ == '__main__':
+def main():
+    coloredlogs.install(level=logging.INFO,
+                        fmt="%(asctime)s %(username)s@%(hostname)s "
+                            "%(programname)s[%(process)d] %(levelname)s %(message)s")
+
     orders = scan_spreadsheet()
 
     for order in orders:
         gen_order(**order)
+
+
+if __name__ == '__main__':
+    main()
