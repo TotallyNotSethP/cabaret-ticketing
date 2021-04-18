@@ -5,6 +5,7 @@ import json
 import flask
 from flask import Flask, Response, render_template
 import psycopg2
+import psycopg2.extras
 
 # Make A Flask App
 app = Flask(__name__, template_folder="templates")
@@ -20,7 +21,7 @@ def index():
 @app.route("/internals/get_id/<id_>")
 def get_id(id_):
     DATABASE_URL = os.environ.get('DATABASE_URL')
-    with psycopg2.connect(DATABASE_URL) as conn:
+    with psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT * FROM tickets WHERE ticket_id=%(ticket_id)s;", {"ticket_id": id_})
             return flask.Response(json.dumps(dict(cur.fetchone())), mimetype="application/json")
