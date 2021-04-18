@@ -43,7 +43,6 @@ def mark_ticket_as_scanned(id_):
         with conn.cursor() as cur:
             cur.execute("UPDATE tickets SET scanned=true WHERE ticket_id=%(ticket_id)s RETURNING ticket_id;",
                         {"ticket_id": id_})
-            print(cur.fetchone())
             if cur.fetchone() is not None:
                 return Response(status=204)
             else:
@@ -56,7 +55,6 @@ def mark_ticket_as_not_scanned(id_):
         with conn.cursor() as cur:
             cur.execute("UPDATE tickets SET scanned=false WHERE ticket_id=%(ticket_id)s RETURNING ticket_id;",
                         {"ticket_id": id_})
-            print(cur.fetchone())
             if cur.fetchone() is not None:
                 return Response(status=204)
             else:
