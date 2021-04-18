@@ -2,10 +2,14 @@
 import os
 import json
 
-import flask
 from flask import Flask, Response, render_template
 import psycopg2
 import psycopg2.extras
+
+
+# Constants
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
 
 # Make A Flask App
 app = Flask(__name__, template_folder="templates")
@@ -17,10 +21,9 @@ def index():
     return render_template("index.html")
 
 
-# Shh! This will soon be used to get information about a ticket.
+# Shh! This is used on the back end to get information about a ticket.
 @app.route("/internals/get_ticket/<id_>")
 def get_ticket(id_):
-    DATABASE_URL = os.environ.get('DATABASE_URL')
     with psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT ticket_id, cast_member_name, o.order_number, ticket_number, s.showtime, on_roof, "
@@ -31,6 +34,32 @@ def get_ticket(id_):
             try:
                 return Response(json.dumps(dict(cur.fetchone()), default=str), mimetype="application/json")
             except TypeError:
+                return Response(status=404)
+
+
+@app.route("/internals/mark_ticket_as_scanned/<id_>", methods=['PUT'])
+def mark_ticket_as_scanned(id_):
+    with psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+        with conn.cursor() as cur:
+            cur.execute("UPDATE tickets SET scanned=true WHERE ticket_id=%(ticket_id)s RETURNING ticket_id;",
+                        {"ticket_id": id_})
+            print(cur.fetchone())
+            if cur.fetchone() is not None:
+                return Response(status=204)
+            else:
+                return Response(status=404)
+
+
+@app.route("/internals/mark_ticket_as_not_scanned/<id_>", methods=['PUT'])
+def mark_ticket_as_not_scanned(id_):
+    with psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+        with conn.cursor() as cur:
+            cur.execute("UPDATE tickets SET scanned=false WHERE ticket_id=%(ticket_id)s RETURNING ticket_id;",
+                        {"ticket_id": id_})
+            print(cur.fetchone())
+            if cur.fetchone() is not None:
+                return Response(status=204)
+            else:
                 return Response(status=404)
 
 
