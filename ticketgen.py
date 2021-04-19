@@ -6,6 +6,7 @@ import re
 import typing
 import string
 import logging
+import pathlib
 
 import requests
 import urllib
@@ -13,6 +14,7 @@ import psycopg2
 import psycopg2.extras
 import openpyxl
 import coloredlogs
+import fitz
 
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.colors import HexColor
@@ -23,7 +25,7 @@ DATABASE_URL = "postgres://ojgkovunswhndg:9936b33ab2efff9a5091943ee8c5a31deb0b24
                "-83-165.compute-1.amazonaws.com:5432/d3l2d60pufekgb"  # os.environ.get('DATABASE_URL')
 
 
-class Incrementer():
+class Incrementer:
     def __init__(self, start_at=0):
         self.incrementer = start_at
 
@@ -41,9 +43,7 @@ class Incrementer():
 
 
 def add_ticket_to_database(cast_member: str, order_number: str, ticket_number: int,
-                           showtime: datetime.datetime, seating_group: str, on_roof: bool = None):
-    id = json.loads(requests.get("https://www.uuidtools.com/api/generate/v4").content)[0]
-
+                           showtime: datetime.datetime, seating_group: str, id_: str, on_roof: bool = None):
     with psycopg2.connect(DATABASE_URL) as conn:
         with conn.cursor() as cur:
             if on_roof is not None:
@@ -51,7 +51,7 @@ def add_ticket_to_database(cast_member: str, order_number: str, ticket_number: i
                                                     on_roof, seating_group)
                                             VALUES (%(id)s, %(cast_member)s, %(order_number)s, %(ticket_number)s,
                                                     %(showtime)s, %(on_roof)s, %(seating_group)s);""",
-                            {"id": id, "cast_member": cast_member, "order_number": order_number,
+                            {"id": id_, "cast_member": cast_member, "order_number": order_number,
                              "ticket_number": ticket_number, "showtime": showtime, "on_roof": on_roof,
                              "seating_group": seating_group})
             else:
@@ -59,7 +59,7 @@ def add_ticket_to_database(cast_member: str, order_number: str, ticket_number: i
                                                     seating_group)
                                             VALUES (%(id)s, %(cast_member)s, %(order_number)s, %(ticket_number)s,
                                                     %(showtime)s, %(seating_group)s)""",
-                            {"id": id, "cast_member": cast_member, "order_number": order_number,
+                            {"id": id_, "cast_member": cast_member, "order_number": order_number,
                              "ticket_number": ticket_number, "showtime": showtime, "on_roof": on_roof,
                              "seating_group": seating_group})
 
@@ -79,13 +79,13 @@ def get_cast_from_showtime(showtime: datetime.datetime):
             return cur.fetchone()["cast"]
 
 
-def gen_ticket(header: str = "TCA's Musical Theater Presents...", data: tuple[str, str, str, str] = (),
+def gen_ticket(id_: str, header: str = "TCA's Musical Theater Presents...", data: tuple[str, str, str, str] = (),
                footer: str = "Located At The Ritz Theater", copyright: str = "Ticket Created By Seth Peace",
                logo_size: typing.Union[int, float] = 3.5,
                logo: typing.Annotated[str, "filepath to image"] = "static/img/logo.jpg",
                save_to: typing.Annotated[str, "filepath to pdf (will overwrite if exists)"] = "ticket.pdf"):
     # Get QR Code
-    response = requests.get("https://api.qrserver.com/v1/create-qr-code/?" + urllib.parse.urlencode({"data": data}))
+    response = requests.get("https://api.qrserver.com/v1/create-qr-code/?" + urllib.parse.urlencode({"data": id_}))
     with open("qrcode.png", "wb") as f:
         f.write(response.content)
 
@@ -128,6 +128,8 @@ def gen_ticket(header: str = "TCA's Musical Theater Presents...", data: tuple[st
 def gen_tickets(cast_member: str, order_number: str, showtime: datetime.datetime,
                 tickets_generated_in_showtime: Incrementer, cast: str, on_roof: typing.Optional[bool],
                 tickets_generated_in_order: int, tickets: int, formatted_showtime: str, total_tickets: int):
+    formatted_order_number = f"{int(order_number):02}" if order_number.isnumeric() else f"00-{order_number}"
+
     for ticket_number in range(int(tickets_generated_in_order + 1), int(tickets_generated_in_order + tickets + 1)):
         seating_group = "A" if int(tickets_generated_in_showtime) < 50 else "B"
 
@@ -140,10 +142,10 @@ def gen_tickets(cast_member: str, order_number: str, showtime: datetime.datetime
                 f"Group {seating_group} | {cast} Cast")
 
         # Call The Function Above
-        formatted_order_number = f"{int(order_number):02}" if order_number.isnumeric() else f"00-{order_number}"
-        gen_ticket(data=DATA, save_to=f"tickets/{formatted_order_number}/{ticket_number:02}.pdf")
+        id_ = json.loads(requests.get("https://www.uuidtools.com/api/generate/v4").content)[0]
+        gen_ticket(id_, data=DATA, save_to=f"tickets/{formatted_order_number}/{ticket_number:02}.pdf")
 
-        add_ticket_to_database(cast_member, order_number, ticket_number, showtime, seating_group, on_roof)
+        add_ticket_to_database(cast_member, order_number, ticket_number, showtime, seating_group, id_, on_roof)
 
         tickets_generated_in_showtime.increment()
 
@@ -167,12 +169,15 @@ def gen_order(cast_member: str, order_number: str, tickets: list[typing.Mapping[
 
         tickets_generated_in_order += showtime["tickets"]
 
+    formatted_order_number = f"{int(order_number):02}" if order_number.isnumeric() else f"00-{order_number}"
+    convert_pdfs_to_jpgs(f"tickets/{formatted_order_number}", True)
+
     add_order_to_database(order_number, total_tickets)
 
 
 def scan_spreadsheet(spreadsheet: typing.Annotated[str, "Path to an .xlsx file"] = "static/xlsx/"
                                                                                    "Lion King Tickets Spreadsheet.xlsx",
-                     data_range: typing.Annotated[str, "Excel data range"] = "A6:Z6"):
+                     data_range: typing.Annotated[str, "Excel data range"] = "A5:Z61"):
     SHOWTIME_INCREMENTORS = {(datetime.datetime(2021, 5, 7, 16, 0), None): Incrementer(),
                              (datetime.datetime(2021, 5, 7, 18, 0), None): Incrementer(),
                              (datetime.datetime(2021, 5, 7, 20, 0), False): Incrementer(),
@@ -264,6 +269,27 @@ def scan_spreadsheet(spreadsheet: typing.Annotated[str, "Path to an .xlsx file"]
         if len(order["tickets"]) > 0:
             orders.append(order)
     return orders
+
+
+def convert_pdf_to_jpg(path_to_pdf: typing.Annotated[str, "Path to a .pdf file"],
+                       output_jpg: typing.Annotated[str, "Path to a .jpg file (will overwrite if exists)"]):
+    pdf = fitz.open(path_to_pdf)
+    page = pdf.loadPage(0)
+    pixmap = page.getPixmap()
+    pixmap.writePNG(output_jpg)
+
+
+def convert_pdfs_to_jpgs(folder_path: typing.Annotated[str, "Path to a folder with .pdf files"],
+                         delete_pdf: bool = False):
+    logging.info("Converting PDFs to JPGs")
+    with os.scandir(folder_path) as folder:
+        for file in folder:
+            file_path = pathlib.Path(file.name)
+            if file_path.suffix == ".pdf":
+                convert_pdf_to_jpg(os.path.join(folder_path, file_path),
+                                   os.path.join(folder_path, file_path.stem + ".jpg"))
+                if delete_pdf:
+                    os.remove(os.path.join(folder_path, file_path))
 
 
 def main():

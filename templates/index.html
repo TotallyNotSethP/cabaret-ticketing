@@ -14,16 +14,19 @@
     -->
 
     <head>
+        <meta name="apple-mobile-web-app-capable" content="yes">
+
         <title>QR Code Scan Test</title>
 
         <!-- Imports -->
+        <script type="text/javascript" src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
         <script type="text/javascript" src="{{ url_for('static', filename='js/instascan.min.js') }}"></script> <!-- Instascan powers QR Code Scanning -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"
                 integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
                 crossorigin="anonymous"></script> <!-- JQuery powers the website basics -->
     </head>
     <body>
-        <video id="preview"></video> <!-- Instascan puts the Camera Preview in here TODO: Make it look better -->
+        <video id="preview" playsinline></video> <!-- Instascan puts the Camera Preview in here TODO: Make it look better -->
         <div id="content-goes-here">Scan A QR Code!</div> <!-- Instascan puts the content of the QR Code in here TODO: Make it look better -->
 
         <script type="text/javascript">
