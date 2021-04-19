@@ -85,7 +85,10 @@ def gen_ticket(id_: str, header: str = "TCA's Musical Theater Presents...", data
                logo: typing.Annotated[str, "filepath to image"] = "static/img/logo.jpg",
                save_to: typing.Annotated[str, "filepath to pdf (will overwrite if exists)"] = "ticket.pdf"):
     # Get QR Code
-    response = requests.get("https://api.qrserver.com/v1/create-qr-code/?" + urllib.parse.urlencode({"data": id_}))
+    response = requests.get("https://api.qrserver.com/v1/create-qr-code/?" + urllib.parse.urlencode({"data": id_}),
+                            timeout=60, headers={'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                                                               'AppleWebKit/537.36 (KHTML, like Gecko) '
+                                                               'Chrome/86.0.4240.75 Safari/537.36'})
     with open("qrcode.png", "wb") as f:
         f.write(response.content)
 
@@ -142,7 +145,10 @@ def gen_tickets(cast_member: str, order_number: str, showtime: datetime.datetime
                 f"Group {seating_group} | {cast} Cast")
 
         # Call The Function Above
-        id_ = json.loads(requests.get("https://www.uuidtools.com/api/generate/v4").content)[0]
+        id_ = json.loads(requests.get("https://www.uuidtools.com/api/generate/v4", timeout=60,
+                                      headers={'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                                                             'AppleWebKit/537.36 (KHTML, like Gecko) '
+                                                             'Chrome/86.0.4240.75 Safari/537.36'}).content)[0]
         gen_ticket(id_, data=DATA, save_to=f"tickets/{formatted_order_number}/{ticket_number:02}.pdf")
 
         add_ticket_to_database(cast_member, order_number, ticket_number, showtime, seating_group, id_, on_roof)
