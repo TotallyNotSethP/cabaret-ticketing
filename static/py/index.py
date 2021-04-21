@@ -21,9 +21,8 @@ def get_ticket(ticket_id):
             content = json.loads(content)
         except UnboundLocalError:
             timer.setTimeout(get_content, 100)
-
     get_content()
-    return "\n".join(content.values())
+    return "\n".join(map(str, content.values()))
 
 
 scanner = window.Instascan.Scanner.new({"video": document.getElementById('video-preview'), "mirror": False})
