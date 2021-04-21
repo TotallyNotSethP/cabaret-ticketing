@@ -23,7 +23,7 @@ def get_ticket(ticket_id):
             timer.setTimeout(get_content, 100)
 
     get_content()
-    return content.values().join("\n")
+    return "\n".join(content.values())
 
 
 scanner = window.Instascan.Scanner.new({"video": document.getElementById('video-preview'), "mirror": False})
