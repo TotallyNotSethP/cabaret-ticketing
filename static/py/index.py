@@ -11,9 +11,13 @@ def start_camera(cameras):
 def get_ticket(ticket_id):
     def on_complete(request):
         global content
+        print(f"saving request text \"{request.text}\"")
         content = request.text
+        print(f"request text \"{request.text}\" saved")
     content = "Hello"
+    print(f"getting ticket {ticket_id}")
     ajax.get(f'/internals/get_ticket/{ticket_id}', oncomplete=on_complete, blocking=True)
+    print(f"got ticket {ticket_id}")
     return content
 
 
