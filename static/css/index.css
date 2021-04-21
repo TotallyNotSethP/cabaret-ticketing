@@ -1,12 +1,10 @@
-#content-goes-here {
+.text {
     font-size: 42px;
-    align-content: center;
 }
 
-#preview {
-    align-content: center;
-}
-
-body {
-    background-color: aqua;
+.centered {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
