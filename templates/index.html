@@ -34,8 +34,8 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     </head>
     <body onload="brython()">
-        <video id="preview" playsinline></video> <!-- Instascan puts the Camera Preview in here TODO: Make it look better -->
-        <div id="content-goes-here">Scan A QR Code!</div> <!-- Instascan puts the content of the QR Code in here TODO: Make it look better -->
+        <video id="preview" playsinline></video>
+        <div id="content-goes-here">Waiting For QR Code...</div>
 
         <script type="text/python" src="{{ url_for('static', filename='py/index.py') }}"></script>
     </body>
