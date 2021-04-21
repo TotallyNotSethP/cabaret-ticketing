@@ -1,6 +1,5 @@
-from browser import window, document, ajax
+from browser import window, document, ajax, timer
 import json
-import time
 
 
 def start_camera(cameras):
@@ -15,13 +14,15 @@ def get_ticket(ticket_id):
         global content
         content = request.text
     ajax.get(f'/internals/get_ticket/{ticket_id}', oncomplete=on_complete, blocking=True)
-    while True:
+
+    def get_content():
+        global content
         try:
             content = json.loads(content)
         except UnboundLocalError:
-            time.sleep(0.1)
-        else:
-            break
+            timer.setTimeout(get_content, 100)
+
+    get_content()
     return content.values().join("\n")
 
 
