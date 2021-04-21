@@ -1,5 +1,7 @@
 from browser import window, document, ajax, timer
 import json
+import datetime
+import re
 
 
 def start_camera(cameras):
@@ -13,6 +15,7 @@ def get_ticket(ticket_id):
     def on_complete(request):
         global content
         content = request.text
+
     ajax.get(f'/internals/get_ticket/{ticket_id}', oncomplete=on_complete, blocking=True)
 
     def get_content():
@@ -21,8 +24,16 @@ def get_ticket(ticket_id):
             content = json.loads(content)
         except UnboundLocalError:
             timer.setTimeout(get_content, 100)
+
     get_content()
-    return "\n".join(map(str, content.values()))
+    return "<br>".join([
+        "Name: " + str(content["cast_member_name"]),
+        "Order Number: " + str(content["order_number"]),
+        "Showtime: " + re.sub(r"^0|(?<=\s)0", "", re.sub(r"(?<=[0-9])[AP]M", lambda m: m.group().lower(),
+                                                         datetime.fromisoformat(str(content["showtime"])).strftime(
+                                                             "%a %D %I%p")))
+        + (" (Roof)" if content["on_roof"] else "")
+    ])
 
 
 scanner = window.Instascan.Scanner.new({"video": document.getElementById('video-preview'), "mirror": False})
