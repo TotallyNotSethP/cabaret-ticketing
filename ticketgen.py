@@ -7,6 +7,7 @@ import typing
 import string
 import logging
 import pathlib
+import time
 
 import requests
 import urllib
@@ -85,10 +86,18 @@ def gen_ticket(id_: str, header: str = "TCA's Musical Theater Presents...", data
                logo: typing.Annotated[str, "filepath to image"] = "static/img/logo.jpg",
                save_to: typing.Annotated[str, "filepath to pdf (will overwrite if exists)"] = "ticket.pdf"):
     # Get QR Code
-    response = requests.get("https://api.qrserver.com/v1/create-qr-code/?" + urllib.parse.urlencode({"data": id_}),
-                            timeout=60, headers={'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                                                               'AppleWebKit/537.36 (KHTML, like Gecko) '
-                                                               'Chrome/86.0.4240.75 Safari/537.36'})
+    while True:
+        try:
+            response = requests.get(
+                "https://api.qrserver.com/v1/create-qr-code/?" + urllib.parse.urlencode({"data": id_}),
+                timeout=60, headers={'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                                                   'AppleWebKit/537.36 (KHTML, like Gecko) '
+                                                   'Chrome/86.0.4240.75 Safari/537.36'})
+        except requests.exceptions.RequestException as e:
+            logging.error(f"{e}; retrying...")
+        else:
+            break
+
     with open("qrcode.png", "wb") as f:
         f.write(response.content)
 
@@ -160,7 +169,8 @@ def gen_order(cast_member: str, order_number: str, tickets: list[typing.Mapping[
     total_tickets = int(sum([showtime["tickets"] for showtime in tickets]))
 
     print()
-    logging.info(f"Generating {total_tickets} Tickets For {cast_member} (Order {order_number})")
+    plural = "s" if total_tickets != 1 else ""
+    logging.info(f"Generating {total_tickets} Ticket{plural} For {cast_member} (Order {order_number})")
 
     tickets_generated_in_order = 0
     for showtime in tickets:
@@ -175,15 +185,15 @@ def gen_order(cast_member: str, order_number: str, tickets: list[typing.Mapping[
 
         tickets_generated_in_order += showtime["tickets"]
 
-    formatted_order_number = f"{int(order_number):02}" if order_number.isnumeric() else f"00-{order_number}"
-    convert_pdfs_to_jpgs(f"tickets/{formatted_order_number}", True)
+    # formatted_order_number = f"{int(order_number):02}" if order_number.isnumeric() else f"00-{order_number}"
+    # convert_pdfs_to_jpgs(f"tickets/{formatted_order_number}", True)
 
     add_order_to_database(order_number, total_tickets)
 
 
 def scan_spreadsheet(spreadsheet: typing.Annotated[str, "Path to an .xlsx file"] = "static/xlsx/"
                                                                                    "Lion King Tickets Spreadsheet.xlsx",
-                     data_range: typing.Annotated[str, "Excel data range"] = "A5:Z61"):
+                     data_range: typing.Annotated[str, "Excel data range"] = "A62:Z76"):
     SHOWTIME_INCREMENTORS = {(datetime.datetime(2021, 5, 7, 16, 0), None): Incrementer(),
                              (datetime.datetime(2021, 5, 7, 18, 0), None): Incrementer(),
                              (datetime.datetime(2021, 5, 7, 20, 0), False): Incrementer(),
@@ -271,7 +281,7 @@ def scan_spreadsheet(spreadsheet: typing.Annotated[str, "Path to an .xlsx file"]
                     row_num_offset = int(start_cell_loc[0:])
                 print()
                 logging.warning(f"Cell with value {repr(cell.value)} ignored @ "
-                                f"{string.ascii_uppercase[col]}{row_num+row_num_offset}!")
+                                f"{string.ascii_uppercase[col]}{row_num + row_num_offset}!")
         if len(order["tickets"]) > 0:
             orders.append(order)
     return orders
