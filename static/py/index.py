@@ -1,4 +1,5 @@
 from browser import window, document, ajax
+import json
 
 
 def start_camera(cameras):
@@ -13,7 +14,8 @@ def get_ticket(ticket_id):
         global content
         content = request.text
     ajax.get(f'/internals/get_ticket/{ticket_id}', oncomplete=on_complete, blocking=True)
-    return content
+    content = json.loads(content)
+    return content.values().join("\n")
 
 
 scanner = window.Instascan.Scanner.new({"video": document.getElementById('video-preview'), "mirror": False})
