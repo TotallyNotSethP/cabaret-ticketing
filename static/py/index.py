@@ -13,7 +13,7 @@ def get_ticket(ticket_id):
         global content
         content = request.text
     content = "Hello"
-    ajax.get(f'/internals/get_ticket/{ticket_id}', oncomplete=on_complete)
+    ajax.get(f'/internals/get_ticket/{ticket_id}', oncomplete=on_complete, blocking=True)
     return content
 
 
