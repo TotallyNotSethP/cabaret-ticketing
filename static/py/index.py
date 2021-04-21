@@ -1,7 +1,7 @@
 from browser import window, document
 
-scanner = window.Instascan.Scanner({"video": document.getElementById('preview'),
-                                    "mirror": False})
+scanner = window.Instascan.Scanner.new({"video": document.getElementById('preview'),
+                                        "mirror": False})
 
 scanner.addListener('scan', lambda content: window.jQuery('#content-goes-here').html(content))
 
