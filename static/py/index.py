@@ -28,7 +28,6 @@ def get_ticket(ticket_id):
     get_content()
     return "<br>".join([
         "Name: " + str(content["cast_member_name"]),
-        "Order Number: " + str(content["order_number"]),
         "Showtime: " + re.sub(r"^0|(?<=\s)0", "", re.sub(r"(?<=[0-9])[AP]M", lambda m: m.group().lower(),
                                                          datetime.datetime.fromisoformat(str(content["showtime"]))
                                                          .strftime("%a %m/%d/%y %I%p")))

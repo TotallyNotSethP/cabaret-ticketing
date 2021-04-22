@@ -3,3 +3,4 @@ gunicorn
 requests
 reportlab
 psycopg2-binary
+pytz
