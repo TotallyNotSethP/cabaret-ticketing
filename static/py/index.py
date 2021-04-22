@@ -31,7 +31,7 @@ def get_ticket(ticket_id):
         "Order Number: " + str(content["order_number"]),
         "Showtime: " + re.sub(r"^0|(?<=\s)0", "", re.sub(r"(?<=[0-9])[AP]M", lambda m: m.group().lower(),
                                                          datetime.datetime.fromisoformat(str(content["showtime"]))
-                                                         .strftime("%a %D %I%p")))
+                                                         .strftime("%a %m/%d/%y %I%p")))
         + (" (Roof)" if content["on_roof"] else "")
     ])
 
