@@ -9,3 +9,9 @@
     left: 50%;
     transform: translate(-50%, -50%);
 }
+
+#page-contents {
+    position: absolute;
+    left: 0;
+    right: 0;
+}
