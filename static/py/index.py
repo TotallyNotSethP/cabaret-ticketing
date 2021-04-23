@@ -6,7 +6,7 @@ import re
 
 class PST(datetime.tzinfo):
     def utcoffset(self, dt):
-        return datetime.timedelta(hours=-8)
+        return datetime.timedelta(hours=-7)
 
     def tzname(self, dt):
         return "PST"
