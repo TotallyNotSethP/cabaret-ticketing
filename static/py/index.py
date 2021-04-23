@@ -4,6 +4,17 @@ import datetime
 import re
 
 
+class PST(datetime.tzinfo):
+    def utcoffset(self, dt):
+        return datetime.timedelta(hours=-8)
+
+    def tzname(self, dt):
+        return "PST"
+
+    def dst(self, dt):
+        return datetime.timedelta(hours=-7)
+
+
 def start_camera(cameras):
     if len(cameras) > 0:
         scanner.start(cameras[0])
@@ -26,11 +37,16 @@ def get_ticket(ticket_id):
             timer.setTimeout(get_content, 100)
 
     get_content()
+    showtime = datetime.datetime.fromisoformat(str(content["showtime"])).replace(tzinfo=PST())
+    print(showtime - datetime.timedelta(hours=1), showtime, datetime.datetime.now(PST()), showtime + datetime.timedelta(hours=1))
+    if showtime - datetime.timedelta(hours=1) <= datetime.datetime.now(PST()) <= showtime + datetime.timedelta(hours=1):
+        window.jQuery("body").css("background-color", "green")
+    else:
+        window.jQuery("body").css("background-color", "red")
     return "<br>".join([
         "Name: " + str(content["cast_member_name"]),
         "Showtime: " + re.sub(r"^0|(?<=\s)0", "", re.sub(r"(?<=[0-9])[AP]M", lambda m: m.group().lower(),
-                                                         datetime.datetime.fromisoformat(str(content["showtime"]))
-                                                         .strftime("%a %m/%d/%y %I%p")))
+                                                         showtime.strftime("%a %m/%d/%y %I%p")))
         + (" (Roof)" if content["on_roof"] else "")
     ])
 
