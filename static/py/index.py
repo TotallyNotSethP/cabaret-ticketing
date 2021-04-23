@@ -17,7 +17,11 @@ class PST(datetime.tzinfo):
 
 def start_camera(cameras):
     if len(cameras) > 0:
-        scanner.start(cameras[0])
+        camera_param = window.URLSearchParams.new(window.location.search).get("camera")
+        if camera_param:
+            scanner.start(cameras[int(camera_param)])
+        else:
+            scanner.start(cameras[0])
     else:
         window.jQuery('#qr-code-info').html('No cameras found.')
 
