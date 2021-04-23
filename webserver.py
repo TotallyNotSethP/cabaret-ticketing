@@ -32,7 +32,9 @@ def get_ticket(id_):
                         " WHERE ticket_id=%(ticket_id)s ORDER BY tickets.order_number, ticket_number;",
                         {"ticket_id": id_})
             try:
-                return Response(json.dumps(dict(cur.fetchone()), default=str), mimetype="application/json")
+                fetched_row = cur.fetchone()
+                print(fetched_row)
+                return Response(json.dumps(dict(fetched_row), default=str), mimetype="application/json")
             except TypeError:
                 return Response(status=404)
 
