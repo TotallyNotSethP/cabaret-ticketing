@@ -47,7 +47,7 @@ def get_ticket(ticket_id):
     if not showtime - datetime.timedelta(hours=1) <= datetime.datetime.now(PST()) <= showtime + datetime.timedelta(hours=1):
         window.jQuery("body").css("background-color", "red")
         window.jQuery("#warnings-and-errors").html("WRONG SHOWTIME")
-    elif not bool(content["scanned"]):
+    elif bool(content["scanned"]):
         window.jQuery("body").css("background-color", "red")
         window.jQuery("#warnings-and-errors").html("ALREADY BEEN SCANNED")
     else:
