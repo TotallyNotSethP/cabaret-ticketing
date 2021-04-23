@@ -44,10 +44,18 @@ def get_ticket(ticket_id):
     get_content()
     showtime = datetime.datetime.fromisoformat(str(content["showtime"])).replace(tzinfo=PST())
     print(showtime - datetime.timedelta(hours=1), showtime, datetime.datetime.now(PST()), showtime + datetime.timedelta(hours=1))
-    if showtime - datetime.timedelta(hours=1) <= datetime.datetime.now(PST()) <= showtime + datetime.timedelta(hours=1):
-        window.jQuery("body").css("background-color", "green")
-    else:
+    if not showtime - datetime.timedelta(hours=1) <= datetime.datetime.now(PST()) <= showtime + datetime.timedelta(hours=1):
         window.jQuery("body").css("background-color", "red")
+        window.jQuery("#warnings-and-errors").html("WRONG SHOWTIME")
+    elif not bool(content["scanned"]):
+        window.jQuery("body").css("background-color", "red")
+        window.jQuery("#warnings-and-errors").html("ALREADY BEEN SCANNED")
+    else:
+        window.jQuery("body").css("background-color", "green")
+        window.jQuery("#warnings-and-errors").html("")
+        req = ajax.Ajax()
+        req.open("PUT", f"/internals/mark_ticket_as_scanned/{ticket_id}")
+        req.send()
     return "<br>".join([
         "Name: " + str(content["cast_member_name"]),
         "Showtime: " + re.sub(r"^0|(?<=\s)0", "", re.sub(r"(?<=[0-9])[AP]M", lambda m: m.group().lower(),
