@@ -82,7 +82,7 @@ def get_cast_from_showtime(showtime: datetime.datetime):
 
 def gen_ticket(id_: str, header: str = "TCA's Musical Theater Presents...", data: tuple[str, str, str, str] = (),
                footer: str = "Located At The Ritz Theater", copyright: str = "Ticket Created By Seth Peace",
-               logo_size: typing.Union[int, float] = 3.5,
+               logo_size: typing.Union[int, float] = 3.5,  # TODO: Let user pick these options
                logo: typing.Annotated[str, "filepath to image"] = "static/img/logo.jpg",
                save_to: typing.Annotated[str, "filepath to pdf (will overwrite if exists)"] = "ticket.pdf"):
     # Get QR Code
@@ -108,7 +108,7 @@ def gen_ticket(id_: str, header: str = "TCA's Musical Theater Presents...", data
     canvas = Canvas(save_to, pagesize=A8[::-1])
 
     # Draw Logo
-    canvas.drawImage(logo, 0.775 * inch, 1.15 * inch, logo_size * cm, (907 / 2250) * logo_size * cm)
+    canvas.drawImage(logo, 0.775 * inch, 1.15 * inch, logo_size * cm, (907 / 2250) * logo_size * cm)  # TODO: Calculate postions, not hard-code
 
     # Draw Header
     canvas.drawString(0.2 * inch, 1.8 * inch, header)

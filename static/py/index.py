@@ -6,7 +6,7 @@ import re
 
 class PST(datetime.tzinfo):
     def utcoffset(self, dt):
-        return datetime.timedelta(hours=-7)
+        return datetime.timedelta(hours=-7)  # TODO: Figure out why datetime doesnt use DST???
 
     def tzname(self, dt):
         return "PST"
@@ -19,7 +19,7 @@ def start_camera(cameras):
     if len(cameras) > 0:
         camera_param = window.URLSearchParams.new(window.location.search).get("camera")
         if camera_param:
-            scanner.start(cameras[int(camera_param)])
+            scanner.start(cameras[int(camera_param)])  # TODO: Let user decide in UI... someday
         else:
             scanner.start(cameras[0])
     else:
@@ -42,9 +42,11 @@ def get_ticket(ticket_id):
             timer.setTimeout(get_content, 100)
 
     get_content()
-    showtime = datetime.datetime.fromisoformat(str(content["showtime"])).replace(tzinfo=PST())
-    print(showtime - datetime.timedelta(hours=1), showtime, datetime.datetime.now(PST()), showtime + datetime.timedelta(hours=1))
-    if not showtime - datetime.timedelta(hours=1) <= datetime.datetime.now(PST()) <= showtime + datetime.timedelta(hours=1):
+    showtime = datetime.datetime.fromisoformat(str(content["showtime"])).replace(tzinfo=PST())  # TODO: Support multiple timezones?
+    print(showtime - datetime.timedelta(hours=1), showtime, datetime.datetime.now(PST()),
+          showtime + datetime.timedelta(hours=1))
+    if not showtime - datetime.timedelta(hours=1) <= datetime.datetime.now(PST()) <= showtime + datetime.timedelta(
+            hours=1):
         window.jQuery("body").css("background-color", "red")
         window.jQuery("#warnings-and-errors").html("WRONG SHOWTIME")
     elif bool(content["scanned"]):
@@ -64,7 +66,5 @@ def get_ticket(ticket_id):
     ])
 
 
-scanner = window.Instascan.Scanner.new({"video": document.getElementById('video-preview'), "mirror": False})
-scanner.addListener('scan', lambda content, _: window.jQuery('#qr-code-info').html(get_ticket(content)))
-
-window.Instascan.Camera.getCameras().then(start_camera).catch(lambda e: window.jQuery('#qr-code-info').html(e))
+scanner = window.html5QrcodeScanner.new("video-preview", {"fps": 10, "qrbox": 250}, False)
+scanner.render(lambda content: window.jQuery('#qr-code-info').html(get_ticket(content)), lambda error: print(error))
