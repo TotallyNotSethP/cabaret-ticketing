@@ -15,17 +15,6 @@ class PST(datetime.tzinfo):
         return datetime.timedelta(hours=-7)
 
 
-def start_camera(cameras):
-    if len(cameras) > 0:
-        camera_param = window.URLSearchParams.new(window.location.search).get("camera")
-        if camera_param:
-            scanner.start(cameras[int(camera_param)])  # TODO: Let user decide in UI... someday
-        else:
-            scanner.start(cameras[0])
-    else:
-        window.jQuery('#qr-code-info').html('No cameras found.')
-
-
 def get_ticket(ticket_id):
     def on_complete(request):
         global content
