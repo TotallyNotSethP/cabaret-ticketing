@@ -55,5 +55,5 @@ def get_ticket(ticket_id):
     ])
 
 
-scanner = window.html5QrcodeScanner.new("video-preview", {"fps": 10, "qrbox": 250}, False)
+scanner = window.Html5QrcodeScanner.new("video-preview", {"fps": 10, "qrbox": 250}, False)
 scanner.render(lambda content: window.jQuery('#qr-code-info').html(get_ticket(content)), lambda error: print(error))
