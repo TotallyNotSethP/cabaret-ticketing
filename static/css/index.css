@@ -3,16 +3,13 @@
 }
 
 .centered {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    text-align: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 #page-contents {
     width: 90vw;
 }
-/*
-#video-preview {
-    width: 600px
-}
- */

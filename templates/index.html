@@ -8,6 +8,9 @@
     Please No Unauthorized Use ~ Forking is OK
     Thank You,
     𝓢𝓮𝓽𝓱 𝓟𝓮𝓪𝓬𝓮
+
+    Included Open Source Software:
+     - Instascan by @schmich ~ License Located at /static/instascan-LICENSE
     -->
 
     <head>
@@ -18,14 +21,14 @@
         <!-- Imports -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.9.1/brython.min.js"
                 integrity="sha512-QqJtZYGp0eHzvOxKw2RUODSL2iVW/2FH5NAaEobhgiVD0rUTJMVo4oLYd9QyEYwit0en+CGeft8eV/zEFeNPxA=="
-                crossorigin="anonymous"></script> <!-- JS bad. Python better. -->
+                crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/brython/3.9.1/brython_stdlib.min.js"
                 integrity="sha512-+w8uBdt0FTsenu79jeXSP+l6WKTPhQwTtqnJMiyYCvb1IvbhGSwf7O+qZmcaX3dsOB2J3AOWGR/DKQMevte9hQ=="
                 crossorigin="anonymous"></script> <!-- This script helps the one above -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/6.1.4/adapter.min.js"
                 integrity="sha512-FZkQmTcqSzV2aNpWszYA/pPUISx6QjI60lKGwnIsfNFCGqUB7gcobQ9StH3hQCKFN92md3fCaXLzzSpoFat57A=="
-                crossorigin="anonymous"></script> <!-- WebRTC Adapter powers iOS support (TODO: Check if can be removed) -->
-        <script src="https://cdn.jsdelivr.net/gh/mebjas/html5-qrcode@master/minified/html5-qrcode.min.js"></script> <!-- html5-qrcode powers QR Code Scanning -->
+                crossorigin="anonymous"></script> <!-- WebRTC Adapter powers iOS support -->
+        <script type="text/javascript" src="{{ url_for('static', filename='js/instascan.min.js') }}"></script> <!-- Instascan powers QR Code Scanning -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"
                 integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
                 crossorigin="anonymous"></script> <!-- JQuery powers the website basics -->
@@ -35,7 +38,7 @@
     <body onload="brython()">
         <div id="page-contents" class="centered">
             <div id="warnings-and-errors" class="text"></div>
-            <br><div id="video-preview"></div><br>
+            <video id="video-preview" playsinline></video>
             <div id="qr-code-info" class="text">Waiting For QR Code...</div>
         </div>
 
