@@ -18,8 +18,9 @@ app = Flask(__name__, template_folder="templates")
 # Give The User The OS-Specific index.html If They Go To The Homepage
 @app.route("/")
 def index():
-    print(request.user_agent.platform)
-    return render_template("index.html")
+    return render_template("index-apple.html")\
+        if request.user_agent.platform.lower() == "iphone"\
+        else render_template("index.html")
 
 
 # Shh! This is used on the back end to get information about a ticket.
