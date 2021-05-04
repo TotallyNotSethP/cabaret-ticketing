@@ -38,10 +38,10 @@
     <body onload="brython()">
         <div id="page-contents" class="centered">
             <div id="warnings-and-errors" class="text"></div>
-            <video id="video-preview" playsinline></video>
+            <video id="video-preview" class="video-back" playsinline></video>
             <div id="qr-code-info" class="text">Waiting For QR Code...</div>
             <div id="camera-picker-container">
-                <br><label for="camera-picker">Camera: </label>
+                <br><label for="camera-picker">Camera (non-functional on iOS, sorry): </label>
                 <select name="camera-picker" id="camera-picker">
                     <option value="placeholder" id="cam-placeholder" disabled selected hidden>Hang on... Getting a list of cameras</option>
                     <!-- <option value="7ebea52e24a659fc40e7a984ab5eb70d866bb3c78da9de88c79ce5b9e329eab0" id="cam-7ebea52e24a659fc40e7a984ab5eb70d866bb3c78da9de88c79ce5b9e329eab0">Cam 0</option>
