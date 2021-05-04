@@ -64,6 +64,13 @@ def get_ticket(ticket_id):
     ])
 
 
+def change_camera():
+    window.location.replace(
+        f"https://jr-musical-theater-ticketing.herokuapp.com/?camera={document.getElementById('camera-picker').value}")
+
+
+document.getElementById('camera-picker').onchange = change_camera
+
 scanner = window.Instascan.Scanner.new({"video": document.getElementById('video-preview'), "mirror": False})
 scanner.addListener('scan', lambda content, _: window.jQuery('#qr-code-info').html(get_ticket(content)))
 
