@@ -64,7 +64,7 @@ def get_ticket(ticket_id):
     ])
 
 
-def change_camera():
+def change_camera(this):
     window.location.replace(
         f"https://jr-musical-theater-ticketing.herokuapp.com/?camera={document.getElementById('camera-picker').value}")
 
