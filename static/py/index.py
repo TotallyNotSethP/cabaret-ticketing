@@ -1,4 +1,4 @@
-from browser import window, document, ajax, timer
+from browser import window, document, ajax, timer, html
 import json
 import datetime
 import re
@@ -17,18 +17,23 @@ class PST(datetime.tzinfo):
 
 def start_camera(cameras):
     if len(cameras) > 0:
+        for i, camera in enumerate(cameras):
+            document.getElementById("camera-picker") <= html.OPTION(camera.name, **{"value": camera.id,
+                                                                                    "id": "cam"+camera.id,
+                                                                                    "class": "first-camera"
+                                                                                    if i == 0 else ""})
         camera_param = window.URLSearchParams.new(window.location.search).get("camera")
         if camera_param:
             for camera in cameras:
                 if camera.id == camera_param:
                     scanner.start(camera)
+                    document.getElementById("cam-" + camera_param).selected = True
                     break
             else:
                 window.jQuery('#qr-code-info').html(f'Camera with ID \'{camera_param}\' not found.')
-            # document.getElementById("cam-" + camera_param).selected = True
         else:
             scanner.start(cameras[0])
-            # document.getElementById("cam-0").selected = True
+            document.getElementsByClassName("first-camera")[0].selected = True
     else:
         window.jQuery('#qr-code-info').html('No cameras found.')
 
