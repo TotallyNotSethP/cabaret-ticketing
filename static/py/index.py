@@ -20,8 +20,12 @@ def start_camera(cameras):
         camera_param = window.URLSearchParams.new(window.location.search).get("camera")
         if camera_param:
             scanner.start(cameras[int(camera_param)])
+            print("Camera ID: " + str(cameras[int(camera_param)].id))
+            print("Camera Name: " + str(cameras[int(camera_param)].name))
+            # document.getElementById("cam-" + camera_param).selected = True
         else:
             scanner.start(cameras[0])
+            # document.getElementById("cam-0").selected = True
     else:
         window.jQuery('#qr-code-info').html('No cameras found.')
 
