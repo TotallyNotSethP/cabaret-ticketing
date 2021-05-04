@@ -34,7 +34,7 @@ def start_camera(cameras):
         else:
             scanner.start(cameras[0])
             document.getElementsByClassName("first-camera")[0].selected = True
-            window.jQuery('#cam-placeholder').hide()
+            window.jQuery('#camera-picker').hideOption('cam-placeholder')
     else:
         window.jQuery('#qr-code-info').html('No cameras found.')
 
