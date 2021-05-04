@@ -15,12 +15,12 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 app = Flask(__name__, template_folder="templates")
 
 
-# Give The User The OS-Specific index.html If They Go To The Homepage
+# Give The User The OS-Specific index.html.jinja2 If They Go To The Homepage
 @app.route("/")
 def index():
-    return render_template("index-apple.html")\
-        if request.user_agent.platform.lower() == "iphone"\
-        else render_template("index.html")
+    return render_template("index-apple.html.jinja2")\
+        if request.user_agent.platform.lower().strip() == "iphone"\
+        else render_template("index.html.jinja2")
 
 
 # Shh! This is used on the back end to get information about a ticket.
