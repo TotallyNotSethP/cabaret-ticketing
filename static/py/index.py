@@ -19,7 +19,7 @@ def start_camera(cameras):
     if len(cameras) > 0:
         for i, camera in enumerate(cameras):
             document.getElementById("camera-picker") <= html.OPTION(camera.name, **{"value": camera.id,
-                                                                                    "id": "cam"+camera.id,
+                                                                                    "id": "cam-" + camera.id,
                                                                                     "class": "first-camera"
                                                                                     if i == 0 else ""})
         camera_param = window.URLSearchParams.new(window.location.search).get("camera")
