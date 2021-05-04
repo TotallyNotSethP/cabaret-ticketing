@@ -40,6 +40,12 @@
             <div id="warnings-and-errors" class="text"></div>
             <video id="video-preview" playsinline></video>
             <div id="qr-code-info" class="text">Waiting For QR Code...</div>
+            <div id="camera-picker-container">
+                <label for="camera-picker">Camera: </label>
+                <select name="camera-picker" id="camera-picker">
+                    <option value="" disabled selected>Hang on, getting a list of cameras...</option>
+                </select>
+            </div>
         </div>
 
         <script type="text/python" src="{{ url_for('static', filename='py/index.py') }}"></script>
