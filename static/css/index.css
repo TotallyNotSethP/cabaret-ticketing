@@ -17,3 +17,8 @@
 select:invalid {
     color: gray;
 }
+
+select {
+    border-width: 1px;
+    border-style: outset;
+}
