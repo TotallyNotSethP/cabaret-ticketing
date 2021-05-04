@@ -13,3 +13,7 @@
 #page-contents {
     width: 90vw;
 }
+
+select:invalid {
+    color: gray;
+}
