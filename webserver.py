@@ -2,7 +2,7 @@
 import os
 import json
 
-from flask import Flask, Response, render_template
+from flask import Flask, Response, render_template, request
 import psycopg2
 import psycopg2.extras
 
@@ -15,9 +15,10 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 app = Flask(__name__, template_folder="templates")
 
 
-# Give The User index.html If They Go To The Homepage
+# Give The User The OS-Specific index.html If They Go To The Homepage
 @app.route("/")
 def index():
+    print(request.user_agent.platform)
     return render_template("index.html")
 
 
