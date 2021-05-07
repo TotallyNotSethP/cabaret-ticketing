@@ -41,9 +41,10 @@ def start_camera(cameras):
 
 def get_ticket(ticket_id):
     def on_complete(request):
-        global content
+        global content, status
         print(request.status)
         content = request.text
+        status = request.status
 
     ajax.get(f'/internals/get_ticket/{ticket_id}', oncomplete=on_complete, blocking=True)
 
