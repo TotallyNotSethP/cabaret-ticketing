@@ -55,26 +55,34 @@ def get_ticket(ticket_id):
             timer.setTimeout(get_content, 100)
 
     get_content()
-    showtime = datetime.datetime.fromisoformat(str(content["showtime"])).replace(tzinfo=PST())
-    print(showtime - datetime.timedelta(hours=1), showtime, datetime.datetime.now(PST()), showtime + datetime.timedelta(hours=1))
-    if not showtime - datetime.timedelta(hours=1) <= datetime.datetime.now(PST()) <= showtime + datetime.timedelta(hours=1):
-        window.jQuery("body").css("background-color", "red")
-        window.jQuery("#warnings-and-errors").html("WRONG SHOWTIME")
-    elif bool(content["scanned"]):
-        window.jQuery("body").css("background-color", "red")
-        window.jQuery("#warnings-and-errors").html("ALREADY BEEN SCANNED")
+    if status == 200:
+        showtime = datetime.datetime.fromisoformat(str(content["showtime"])).replace(tzinfo=PST())
+        print(showtime - datetime.timedelta(hours=1), showtime, datetime.datetime.now(PST()), showtime + datetime.timedelta(hours=1))
+        if not showtime - datetime.timedelta(hours=1) <= datetime.datetime.now(PST()) <= showtime + datetime.timedelta(hours=1):
+            window.jQuery("body").css("background-color", "red")
+            window.jQuery("#warnings-and-errors").html("WRONG SHOWTIME")
+            return ""
+        elif bool(content["scanned"]):
+            window.jQuery("body").css("background-color", "red")
+            window.jQuery("#warnings-and-errors").html("ALREADY BEEN SCANNED")
+            return ""
+        else:
+            window.jQuery("body").css("background-color", "green")
+            window.jQuery("#warnings-and-errors").html("")
+            req = ajax.Ajax()
+            req.open("PUT", f"/internals/mark_ticket_as_scanned/{ticket_id}")
+            req.send()
+            return "<br>".join([
+                "Name: " + str(content["cast_member_name"]),
+                "Showtime: " + re.sub(r"^0|(?<=\s)0", "", re.sub(r"(?<=[0-9])[AP]M", lambda m: m.group().lower(),
+                                                                 showtime.strftime("%a %m/%d/%y %I%p")))
+                + (" (Roof)" if content["on_roof"] else ""),
+                "Ticket Number: " + str(content["ticket_number"])
+            ])
     else:
-        window.jQuery("body").css("background-color", "green")
-        window.jQuery("#warnings-and-errors").html("")
-        req = ajax.Ajax()
-        req.open("PUT", f"/internals/mark_ticket_as_scanned/{ticket_id}")
-        req.send()
-    return "<br>".join([
-        "Name: " + str(content["cast_member_name"]),
-        "Showtime: " + re.sub(r"^0|(?<=\s)0", "", re.sub(r"(?<=[0-9])[AP]M", lambda m: m.group().lower(),
-                                                         showtime.strftime("%a %m/%d/%y %I%p")))
-        + (" (Roof)" if content["on_roof"] else "")
-    ])
+        window.jQuery("body").css("background-color", "red")
+        window.jQuery("#warnings-and-errors").html("UNKNOWN TICKET ID")
+        return ""
 
 
 def change_camera(this):
