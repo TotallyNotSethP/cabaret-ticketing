@@ -51,7 +51,10 @@ def get_ticket(ticket_id):
     def get_content():
         global content
         try:
-            content = json.loads(content)
+            if content[0] == "{":
+                content = json.loads(content)
+            else:
+                content = ""
         except UnboundLocalError:
             timer.setTimeout(get_content, 100)
         except SyntaxError:
