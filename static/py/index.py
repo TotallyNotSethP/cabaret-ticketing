@@ -54,6 +54,8 @@ def get_ticket(ticket_id):
             content = json.loads(content)
         except UnboundLocalError:
             timer.setTimeout(get_content, 100)
+        except SyntaxError:
+            content = ""
 
     get_content()
     if status == 200:
