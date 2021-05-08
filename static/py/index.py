@@ -51,7 +51,7 @@ def get_ticket(ticket_id):
     def get_content():
         global content
         try:
-            if content[0] == "{":
+            if len(content) > 0 and content[0] == "{":
                 content = json.loads(content)
             else:
                 content = ""
