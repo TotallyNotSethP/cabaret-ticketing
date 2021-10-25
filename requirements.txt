@@ -4,3 +4,6 @@ requests
 reportlab
 psycopg2-binary
 pytz
+openpyxl
+coloredlogs
+PyMuPDF==1.18.15
