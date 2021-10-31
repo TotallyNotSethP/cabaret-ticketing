@@ -7,3 +7,5 @@ pytz
 openpyxl
 coloredlogs
 PyMuPDF==1.18.15
+pathlib
+qrcode

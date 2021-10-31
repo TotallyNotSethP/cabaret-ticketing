@@ -1,20 +1,19 @@
 # Imports
 import os
 import datetime
-import json
 import re
 import typing
 import string
 import logging
 import pathlib
+import uuid
 
-import requests
-import urllib
 import psycopg2
 import psycopg2.extras
 import openpyxl
 import coloredlogs
 import fitz
+import qrcode
 
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.colors import HexColor
@@ -59,20 +58,7 @@ def gen_ticket(id_: str, header: str = "TCA's Musical Theater Presents...", data
                logo: typing.Annotated[str, "filepath to image"] = "static/img/logo.jpg",
                save_to: typing.Annotated[str, "filepath to pdf (will overwrite if exists)"] = "ticket.pdf"):
     # Get QR Code
-    while True:
-        try:
-            response = requests.get(
-                "https://api.qrserver.com/v1/create-qr-code/?" + urllib.parse.urlencode({"data": id_}),
-                timeout=60, headers={'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                                                   'AppleWebKit/537.36 (KHTML, like Gecko) '
-                                                   'Chrome/86.0.4240.75 Safari/537.36'})
-        except requests.exceptions.RequestException as e:
-            logging.error(f"{e}; retrying...")
-        else:
-            break
-
-    with open("qrcode.png", "wb") as f:
-        f.write(response.content)
+    qrcode.make(id_).save("qrcode.png")
 
     # Set Up PDF
     directory = os.path.split(save_to)[0]
@@ -128,10 +114,7 @@ def gen_tickets(cast_member: str, order_number: str, showtime: datetime.datetime
                 "")
 
         # Call The Function Above
-        id_ = json.loads(requests.get("https://www.uuidtools.com/api/generate/v4", timeout=60,
-                                      headers={'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                                                             'AppleWebKit/537.36 (KHTML, like Gecko) '
-                                                             'Chrome/86.0.4240.75 Safari/537.36'}).content)[0]
+        id_ = str(uuid.uuid4())
         gen_ticket(id_, data=DATA, save_to=f"tickets/{formatted_order_number}/{ticket_number:02}.pdf")
 
         add_ticket_to_database(cast_member, order_number, int(tickets_generated_in_showtime), showtime, id_)
@@ -163,20 +146,15 @@ def gen_order(cast_member: str, order_number: str, tickets: list[typing.Mapping[
 def scan_spreadsheet(spreadsheet: typing.Annotated[str, "Path to an .xlsx file"] = "static/xlsx/"
                                                                                    "CabaretTix.xlsx",
                      data_range: typing.Annotated[str, "Excel data range"] = "A2:I59"):
-    SHOWTIME_INCREMENTORS = {datetime.datetime(2021, 10, 6, 14, 0): Incrementer(),
-                             datetime.datetime(2021, 10, 6, 16, 0): Incrementer(),
-                             datetime.datetime(2021, 10, 6, 18, 0): Incrementer(),
-                             }
-
-    TOTAL_TIX_INCREMENTORS = {datetime.datetime(2021, 10, 6, 14, 0): Incrementer(),
-                              datetime.datetime(2021, 10, 6, 16, 0): Incrementer(),
-                              datetime.datetime(2021, 10, 6, 18, 0): Incrementer(),
+    TOTAL_TIX_INCREMENTORS = {datetime.datetime(2021, 11, 6, 14, 0): Incrementer(),
+                              datetime.datetime(2021, 11, 6, 16, 0): Incrementer(),
+                              datetime.datetime(2021, 11, 6, 18, 0): Incrementer(),
                               }
 
     COLUMNS = [None, "Name", None, None, None,
-               datetime.datetime(2021, 10, 6, 14, 0),
-               datetime.datetime(2021, 10, 6, 16, 0),
-               datetime.datetime(2021, 10, 6, 18, 0),
+               datetime.datetime(2021, 11, 6, 14, 0),
+               datetime.datetime(2021, 11, 6, 16, 0),
+               datetime.datetime(2021, 11, 6, 18, 0),
                ]
 
     workbook = openpyxl.load_workbook(filename=spreadsheet)
