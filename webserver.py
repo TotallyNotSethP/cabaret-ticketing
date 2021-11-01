@@ -63,6 +63,11 @@ def index():
     return render_template("index.html.jinja2", platform=request.user_agent.platform.lower().strip())
 
 
+@app.route("/.htaccess")
+def htaccess():
+    return render_template(".htaccess")
+
+
 # Shh! This is used on the back end to get information about a ticket.
 @app.route("/internals/get_ticket/<id_>")
 def get_ticket(id_):
