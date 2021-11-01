@@ -93,22 +93,26 @@ def get_ticket(id_):
                             {"showtime": ticket["showtime"]})
                 ticket_num = cur.fetchone()['scans']
                 tickets_in_showtime = tickets_per_showtime[ticket["showtime"]]
+                correct_showtime = showtime - datetime.timedelta(hours=1) <= datetime.datetime.now(PST()) <= showtime + \
+                                   datetime.timedelta(hours=1)
                 ticket_info = "<br>".join([
                     "Name: " + str(ticket["cast_member_name"]),
                     "Showtime: " + re.sub(r"^0|(?<=\s)0", "", re.sub(r"(?<=[0-9])[AP]M",
                                                                      lambda m: m.group().lower(),
                                                                      showtime.strftime(
                                                                          "%a %m/%d/%y %I%p"))),
-                    f"Scanned This Showtime: {ticket_num+1}/{tickets_in_showtime} "
-                    f"({((ticket_num+1)/tickets_in_showtime)*100:.2f}%)"
+                    f"Scanned This Showtime: {ticket_num + 1}/{tickets_in_showtime} "
+                    f"({((ticket_num + 1) / tickets_in_showtime) * 100:.2f}%)" if not bool(ticket["scanned"]) and
+                                                                                  correct_showtime else
+                    f"Scanned This Showtime: {ticket_num}/{tickets_in_showtime} "
+                    f"({(ticket_num / tickets_in_showtime) * 100:.2f}%)"
                 ])
                 if bool(ticket["scanned"]):
                     return Response(json.dumps({"error": "ALREADY BEEN SCANNED",
                                                 "color": "red",
                                                 "ticket_info": ticket_info}),
                                     mimetype="application/json")
-                elif not showtime - datetime.timedelta(hours=1) <= datetime.datetime.now(PST()) <= showtime + \
-                         datetime.timedelta(hours=1):
+                elif not correct_showtime:
                     return Response(json.dumps({"error": "WRONG SHOWTIME",
                                                 "color": "red",
                                                 "ticket_info": ticket_info}),
