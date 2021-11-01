@@ -44,7 +44,7 @@ $(document).ready(function() {
         scanner.start(cameras[0]);
         let firstcam = document.getElementsByClassName("first-camera");
         firstcam[0].selected = true;
-        $(`#camera-picker option[value="cam-placeholder"]`).hide();
+        $(`#camera-picker`).hideOption("cam-placeholder");
       }
     } else {
       $("#qr-code-info").html('No cameras found.');
