@@ -12,6 +12,7 @@
     Included Open Source Software:
      - Instascan by @schmich ~ License Located at /static/js/instascan-LICENSE
      - Instascan (iOS fork) by @JoesCDB ~ License Located at /static/js/instascan-LICENSE
+     - Toggle Dropdown Options by Glen Little ~ License Located at /static/js/toggleOption-LICENSE
     -->
 
     <head>
@@ -23,13 +24,14 @@
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/3.3.3/adapter.min.js"></script>
         <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.10/vue.min.js"></script>
         {% if platform == "iphone" %}
-        <script type="text/javascript" src="{{ url_for('static', filename='js/instascan-apple.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/instascan-apple.min.js') }}"></script> <!-- Instascan powers the qr code scanning -->
         {% else %}
         <script type="text/javascript" src="{{ url_for('static', filename='js/instascan.min.js') }}"></script>
         {% endif %}
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"
                 integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
                 crossorigin="anonymous"></script> <!-- JQuery powers the website basics -->
+        <script type="text/javascript" src="{{ url_for('static', filename='js/sunwapta.toggleOption.js') }}"></script> <!-- iOS dropdown menu support -->
 
         <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
     </head>
