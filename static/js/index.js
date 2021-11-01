@@ -4,7 +4,7 @@ function sleep(ms) {
 
 
 $(document).ready(function() {
-  let scanner = new Instascan.Scanner({video: document.getElementById('video-preview'), mirror: true}); // Scanner Preview @ #video-preview
+  let scanner = new Instascan.Scanner({video: document.getElementById('video-preview'), mirror: false}); // Scanner Preview @ #video-preview
   scanner.addListener('scan', function (content) { // When QR Code scanned...
     fetch("/internals/get_ticket/" + content) // Get the ticket matching the id
       .then(response => response.json()) // Convert the received ticket info to object
