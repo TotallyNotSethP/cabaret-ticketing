@@ -84,7 +84,7 @@ def get_ticket(id_):
                 showtime = datetime.datetime.fromisoformat(str(ticket["showtime"])).replace(tzinfo=PST())
                 cur.execute("SELECT * FROM showtime_scan_tracker WHERE showtime=%(showtime)s",
                             {"showtime": ticket["showtime"]})
-                ticket_num = cur.fetchone()
+                ticket_num = cur.fetchone()['scans']
                 tickets_in_showtime = tickets_per_showtime[ticket["showtime"]]
                 ticket_info = "<br>".join([
                     "Name: " + str(ticket["cast_member_name"]),
