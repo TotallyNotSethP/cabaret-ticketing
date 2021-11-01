@@ -75,6 +75,8 @@ def get_ticket(id_):
         datetime.datetime(2021, 11, 6, 14, 0): 209,
         datetime.datetime(2021, 11, 6, 16, 0): 226,
         datetime.datetime(2021, 11, 6, 18, 0): 315,
+        datetime.datetime(2021, 11, 1, 16, 0): 3,
+        datetime.datetime(2021, 11, 1, 17, 0): 4,
     }
     with psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
         with conn.cursor() as cur:
