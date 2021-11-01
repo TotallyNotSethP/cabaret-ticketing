@@ -37,7 +37,7 @@ def mark_ticket_as_scanned(id_):
             if showtime is not None:
                 cur.execute("UPDATE showtime_scan_tracker SET scans = scans + 1 WHERE showtime=%(showtime)s "
                             "RETURNING scans;", {"showtime": showtime["showtime"]})
-                return Response(cur.fetchone()["scans"])  #status=204)
+                return Response(cur.fetchone()["scans"])  # status=204)
             else:
                 return Response(status=404)
 
@@ -46,10 +46,13 @@ def mark_ticket_as_scanned(id_):
 def mark_ticket_as_not_scanned(id_):
     with psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
         with conn.cursor() as cur:
-            cur.execute("UPDATE tickets SET scanned=false WHERE ticket_id=%(ticket_id)s RETURNING ticket_id;",
+            cur.execute("UPDATE tickets SET scanned=false WHERE ticket_id=%(ticket_id)s RETURNING showtime;",
                         {"ticket_id": id_})
-            if cur.fetchone() is not None:
-                return Response(status=204)
+            showtime = cur.fetchone()
+            if showtime is not None:
+                cur.execute("UPDATE showtime_scan_tracker SET scans = scans + 1 WHERE showtime=%(showtime)s "
+                            "RETURNING scans;", {"showtime": showtime["showtime"]})
+                return Response(cur.fetchone()["scans"])  # status=204)
             else:
                 return Response(status=404)
 
@@ -63,6 +66,11 @@ def index():
 # Shh! This is used on the back end to get information about a ticket.
 @app.route("/internals/get_ticket/<id_>")
 def get_ticket(id_):
+    tickets_per_showtime = {
+        datetime.datetime(2021, 11, 6, 14, 0): 209,
+        datetime.datetime(2021, 11, 6, 16, 0): 226,
+        datetime.datetime(2021, 11, 6, 18, 0): 315,
+    }
     with psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
         with conn.cursor() as cur:
             # cur.execute("SELECT ticket_id, cast_member_name, o.order_number, ticket_number, s.showtime, on_roof, "
@@ -72,17 +80,22 @@ def get_ticket(id_):
             #             {"ticket_id": id_})
             cur.execute("SELECT * FROM tickets WHERE ticket_id=%(ticket_id)s", {"ticket_id": id_})
             try:
-                fetched_row = cur.fetchone()
-                showtime = datetime.datetime.fromisoformat(str(fetched_row["showtime"])).replace(tzinfo=PST())
+                ticket = cur.fetchone()
+                showtime = datetime.datetime.fromisoformat(str(ticket["showtime"])).replace(tzinfo=PST())
+                cur.execute("SELECT * FROM showtime_scan_tracker WHERE showtime=%(showtime)s",
+                            {"showtime": ticket["showtime"]})
+                ticket_num = cur.fetchone()
+                tickets_in_showtime = tickets_per_showtime[ticket["showtime"]]
                 ticket_info = "<br>".join([
-                    "Name: " + str(fetched_row["cast_member_name"]),
+                    "Name: " + str(ticket["cast_member_name"]),
                     "Showtime: " + re.sub(r"^0|(?<=\s)0", "", re.sub(r"(?<=[0-9])[AP]M",
                                                                      lambda m: m.group().lower(),
                                                                      showtime.strftime(
                                                                          "%a %m/%d/%y %I%p"))),
-                    "Ticket Number: " + str(fetched_row["ticket_number"])
+                    f"Scanned This Showtime: {ticket_num+1}/{tickets_in_showtime} "
+                    f"({((ticket_num+1)/tickets_in_showtime)*100:.2f}%)"
                 ])
-                if bool(fetched_row["scanned"]):
+                if bool(ticket["scanned"]):
                     return Response(json.dumps({"error": "ALREADY BEEN SCANNED",
                                                 "color": "red",
                                                 "ticket_info": ticket_info}),
