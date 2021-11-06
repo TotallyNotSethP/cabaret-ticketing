@@ -1,7 +1,10 @@
+var audio = false;
+var error_sound = new Audio("static/mp3/error.mp3");
+var valid_sound = new Audio("static/mp3/valid.mp3");
+
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
-
 
 $(document).ready(function() {
   let scanner = new Instascan.Scanner({video: document.getElementById('video-preview'), mirror: false}); // Scanner Preview @ #video-preview
@@ -14,6 +17,10 @@ $(document).ready(function() {
         $("body").css("background-color", data["color"]); // Then turn the specified color
         $("#errors").html(data["error"]); // Display any errors
         $("#qr-code-info").html(data["ticket_info"]); // Display ticket info
+        if (audio) {
+          if (data["sound"] === "error") await error_sound.play();
+          else await error_sound.play();
+        }
       })
   });
   Instascan.Camera.getCameras().then(function (cameras) { // Get a list of available cameras
@@ -56,4 +63,10 @@ $(document).ready(function() {
      window.location.replace(
         `https://cabaret-ticketing.herokuapp.com/?camera=${document.getElementById('camera-picker').value}`)
   }
+});
+
+const button = document.querySelector("#enable-audio");
+button.addEventListener('click', event => {
+  button.textContent = "";
+  audio = true;
 });

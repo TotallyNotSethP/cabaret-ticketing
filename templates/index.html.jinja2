@@ -13,6 +13,9 @@
      - Instascan by @schmich ~ License Located at /static/js/instascan-LICENSE
      - Instascan (iOS fork) by @JoesCDB ~ License Located at /static/js/instascan-LICENSE
      - Toggle Dropdown Options by Glen Little ~ License Located at /static/js/toggleOption-LICENSE
+
+     Included Audio:
+      - Microsoft Windows 98 Error - Sound Effect (HD) by Gaming Sound FX ~ https://www.youtube.com/watch?v=9sycZ4GnUA4
     -->
 
     <head>
@@ -49,10 +52,11 @@
                     <option value="2" id="cam-2">Cam 2</option> -->
                 </select>
             </div>
+            <a id="enable-audio" class="text" href="#">Click to enable audio</a>
             {% if platform == "iphone" %}
             <div id="dont-use-safari-msg" class="text">
-                <br>NOTICE: This website doesn't function properly in Safari.
-                <br>Chrome is recommended on iOS. Thanks for understanding!
+                <br>NOTICE: Safari support not guaranteed
+                <br>If you have issues, try Chrome instead
             </div>
             {% endif %}
         </div>

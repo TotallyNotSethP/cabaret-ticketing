@@ -110,22 +110,26 @@ def get_ticket(id_):
                 if bool(ticket["scanned"]):
                     return Response(json.dumps({"error": "ALREADY BEEN SCANNED",
                                                 "color": "red",
+                                                "sound": "error",
                                                 "ticket_info": ticket_info}),
                                     mimetype="application/json")
                 elif not correct_showtime:
                     return Response(json.dumps({"error": "WRONG SHOWTIME",
                                                 "color": "red",
+                                                "sound": "error",
                                                 "ticket_info": ticket_info}),
                                     mimetype="application/json")
                 else:
                     mark_ticket_as_scanned(id_)
                     return Response(json.dumps({"error": "",
                                                 "color": "green",
+                                                "sound": "valid",
                                                 "ticket_info": ticket_info}),
                                     mimetype="application/json")
             except TypeError:
                 return Response(json.dumps({"error": "UNKNOWN TICKET ID",
                                             "color": "red",
+                                            "sound": "error",
                                             "ticket_info": ticket_info}),
                                 mimetype="application/json")
 
