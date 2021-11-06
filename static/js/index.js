@@ -60,7 +60,7 @@ $(document).ready(function() {
     $("#qr-code-info").html(e);
   });
   document.getElementById('camera-picker').onchange = () => {
-     window.location.replace(`${window.location.hostname}/?camera=${document.getElementById('camera-picker').value}`)
+     window.location.replace(`https://${window.location.hostname}/?camera=${document.getElementById('camera-picker').value}`)
   }
 });
 
